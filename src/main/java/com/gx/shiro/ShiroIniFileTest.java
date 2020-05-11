@@ -78,6 +78,16 @@ public class ShiroIniFileTest {
         login("classpath:shiro-multi-realm.ini", token);
     }
 
+    /**
+     * 测试加密密码身份认证
+     */
+    @Test
+    public void testPasswordService() {
+        // 构造身份验证的token
+        UsernamePasswordToken token = new UsernamePasswordToken("375870381@qq.com", "123456");
+        login("classpath:shiro-passwordservice-realm.ini", token);
+    }
+
     public void login(String iniPath, AuthenticationToken token){
         // 使用 IniSecurityManagerFactory 根据 ini 配置文件创建一个 SecurityManager工厂
         IniFactorySupport<SecurityManager> factory = new IniSecurityManagerFactory(iniPath);
