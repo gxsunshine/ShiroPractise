@@ -89,6 +89,30 @@ public class ShiroIniFileTest {
         if (currentUser.isAuthenticated()) {
             System.out.println("用户 " + currentUser.getPrincipal() + " 登陆成功！");
         }
+    }
 
+    /**
+     * 测试JDBCRealm
+     */
+    @Test
+    public void testJDBCRealm() {
+        // 使用 IniSecurityManagerFactory 根据 ini 配置文件创建一个 SecurityManager工厂
+        IniFactorySupport<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro-jdbc-realm.ini");
+        // 获取 SecurityManager 实例
+        SecurityManager securityManager = factory.getInstance();
+        SecurityUtils.setSecurityManager(securityManager);
+        Subject currentUser = SecurityUtils.getSubject();
+        UsernamePasswordToken token = new UsernamePasswordToken("gx", "123456");
+        try {
+            currentUser.login(token);
+        } catch (UnknownAccountException uae) {
+            System.out.println("用户名不存在:" + token.getPrincipal());
+        } catch (IncorrectCredentialsException ice) {
+            System.out.println("账户密码 " + token.getPrincipal()  + " 不正确!");
+        }
+        // 认证成功后
+        if (currentUser.isAuthenticated()) {
+            System.out.println("用户 " + currentUser.getPrincipal() + " 登陆成功！");
+        }
     }
 }
