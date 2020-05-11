@@ -1,6 +1,6 @@
 package com.gx.shiro.config;
 
-import com.gx.shiro.realm.CustomRealm;
+import com.gx.shiro.realm.CustomRealmExtendAuthorizingRealm;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -10,9 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.apache.shiro.mgt.SecurityManager;
 import org.springframework.context.annotation.DependsOn;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @ClassName ShiroConfig
@@ -60,9 +57,9 @@ public class ShiroConfig {
 
     // 自定义的Realm的Bean对象
     @Bean
-    public CustomRealm customRealm() {
+    public CustomRealmExtendAuthorizingRealm customRealm() {
         // 创建一个自定义的Realm，并返回
-        CustomRealm customRealm = new CustomRealm();
+        CustomRealmExtendAuthorizingRealm customRealm = new CustomRealmExtendAuthorizingRealm();
         return customRealm;
     }
 

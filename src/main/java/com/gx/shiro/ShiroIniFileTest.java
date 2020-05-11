@@ -39,6 +39,16 @@ public class ShiroIniFileTest {
     }
 
     /**
+     * 测试自定义realm - 实现AuthorizingRealm接口
+     */
+    @Test
+    public void testByAuthorizingRealm() {
+        // 构造身份验证的token
+        UsernamePasswordToken token = new UsernamePasswordToken("gx", "123456");
+        login("classpath:shiro-custom-realm-authorizingRealm.ini", token);
+    }
+
+    /**
      * 测试JDBCRealm
      */
     @Test
