@@ -10,7 +10,6 @@ import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.text.IniRealm;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.junit.Test;
 
@@ -64,51 +63,31 @@ public class ShiroIniFileTest {
         }
     }
 
+    /**
+     * 测试自定义realm - 实现Realm接口
+     */
     @Test
-    public void test() {
+    public void testByCustomRealm() {
 
-        // 读取 shiro2.ini 文件内容
-//        IniFactorySupport<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro2.ini");
-//        SecurityManager securityManager = factory.getInstance();
-        DefaultSecurityManager securityManager = new DefaultSecurityManager();
-//        IniRealm iniRealm = new IniRealm("classpath:shiro2.ini");
-        // 使用自定义的Realm
-        IniRealm iniRealm = new IniRealm("classpath:shiro-config.ini");
-//        Realm realm = new CustomRealm();
-        securityManager.setRealm(iniRealm);
+        // 使用 IniSecurityManagerFactory 根据 ini 配置文件创建一个 SecurityManager工厂
+        IniFactorySupport<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro-custom-realm.ini");
+        // 获取 SecurityManager 实例
+        SecurityManager securityManager = factory.getInstance();
+        // 将 securityManager 设置到 SecurityUtils 中，方便全局使用
         SecurityUtils.setSecurityManager(securityManager);
-
         Subject currentUser = SecurityUtils.getSubject();
-
-//        Session session = currentUser.getSession();
-//        session.setAttribute("someKey", "aValue");
-//        String value = (String) session.getAttribute("someKey");
-//        if (value.equals("aValue")) {
-//            System.out.println("someKey 的值：" + value);
-//        }
-
-        // 登陆
-        UsernamePasswordToken token = new UsernamePasswordToken("zhangsan", "zhangsan");
-        token.setRememberMe(true);
+        // 构造身份验证的token
+        UsernamePasswordToken token = new UsernamePasswordToken("gx", "123456");
         try {
             currentUser.login(token);
         } catch (UnknownAccountException uae) {
             System.out.println("用户名不存在:" + token.getPrincipal());
         } catch (IncorrectCredentialsException ice) {
             System.out.println("账户密码 " + token.getPrincipal()  + " 不正确!");
-        } catch (LockedAccountException lae) {
-            System.out.println("用户名 " + token.getPrincipal() + " 被锁定 !");
         }
-
         // 认证成功后
         if (currentUser.isAuthenticated()) {
             System.out.println("用户 " + currentUser.getPrincipal() + " 登陆成功！");
-            //测试角色
-            System.out.println("是否拥有 manager 角色：" + currentUser.hasRole("manager"));
-            //测试权限
-            System.out.println("是否拥有 user:create 权限" + currentUser.isPermitted("user:create"));
-            //退出
-            currentUser.logout();
         }
 
     }

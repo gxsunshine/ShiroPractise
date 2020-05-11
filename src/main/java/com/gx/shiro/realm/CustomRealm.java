@@ -27,7 +27,7 @@ public class CustomRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         // 从 token 中获取用户身份信息
         String username = (String) token.getPrincipal();
-//        String password = (String) token.getCredentials();
+//        String password = new String((char[])token.getCredentials());
         System.out.println("username:"+ username);
 //        System.out.println("password:"+ password);
         // 通过 username 从数据库中查询账号和密码信息
