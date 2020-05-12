@@ -1,6 +1,8 @@
 package com.gx.shiro.config;
 
+import com.gx.shiro.realm.CustomRealmCache;
 import com.gx.shiro.realm.CustomRealmExtendAuthorizingRealm;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -52,15 +54,46 @@ public class ShiroConfig {
         DefaultWebSecurityManager defaultSecurityManager = new DefaultWebSecurityManager();
         // 设置自定义realm对象
         defaultSecurityManager.setRealm(customRealm());
+        System.out.println("cacheManage:"+cacheManager());
+        defaultSecurityManager.setCacheManager(cacheManager());
         return defaultSecurityManager;
     }
 
     // 自定义的Realm的Bean对象
+//    @Bean
+//    public CustomRealmExtendAuthorizingRealm customRealm() {
+//        // 创建一个自定义的Realm，并返回
+//        CustomRealmExtendAuthorizingRealm customRealm = new CustomRealmExtendAuthorizingRealm();
+//        return customRealm;
+//    }
+
+    // 自定义的Realm的Bean对象 -- 带有缓存机制的
     @Bean
-    public CustomRealmExtendAuthorizingRealm customRealm() {
+    public CustomRealmCache customRealm() {
         // 创建一个自定义的Realm，并返回
-        CustomRealmExtendAuthorizingRealm customRealm = new CustomRealmExtendAuthorizingRealm();
+        CustomRealmCache customRealm = new CustomRealmCache();
+        // 启用缓存，默认 false；
+        customRealm.setCachingEnabled(true);
+        // 启用身份验证缓存，即缓存 AuthenticationInfo 信息，默认 false；
+        customRealm.setAuthenticationCachingEnabled(true);
+        // 缓存 AuthenticationInfo 信息的缓存名称；
+        customRealm.setAuthenticationCacheName("authentication");
+        // 启用授权缓存，即缓存 AuthorizationInfo 信息，默认 false；
+        customRealm.setAuthorizationCachingEnabled(true);
+        // 缓存 AuthorizationInfo 信息的缓存名称；
+        customRealm.setAuthorizationCacheName("authorization");
         return customRealm;
+    }
+
+    /**
+     * cacheManager：缓存管理器，此处使用 EhCacheManage
+     * @return
+     */
+    @Bean
+    public EhCacheManager cacheManager(){
+        EhCacheManager cacheManager = new EhCacheManager();
+        cacheManager.setCacheManagerConfigFile("classpath:ehcache.xml");
+        return cacheManager;
     }
 
 
