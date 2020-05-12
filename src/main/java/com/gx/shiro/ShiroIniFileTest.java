@@ -88,6 +88,33 @@ public class ShiroIniFileTest {
         login("classpath:shiro-passwordservice-realm.ini", token);
     }
 
+    /**
+     * 测试加密密码身份认证 -- MD5 + 自定义salt
+     */
+    @Test
+    public void testHashedCredentialsMatcher() {
+        // 构造身份验证的token
+        UsernamePasswordToken token = new UsernamePasswordToken("gx", "123456");
+        login("classpath:shiro-HashedCredentialsMatcher-realm.ini", token);
+    }
+
+    /**
+     * 测试加密密码身份认证 -- MD5 + 自定义salt -- 重试次数限制
+     */
+    @Test
+    public void testHashedCredentialsMatcherAndRetryLimit() {
+        // 模仿错误密码登陆超过五次后报错
+        UsernamePasswordToken token = new UsernamePasswordToken("gx", "1234568");
+        for(int i=0; i < 6; i++){
+            try{
+                login("classpath:shiro-limit-HashedCredentialsMatcher-realm.ini", token);
+            }catch (ExcessiveAttemptsException e){
+                System.out.println("错误的重复登陆操作超过五次，锁定账号一个小时");
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void login(String iniPath, AuthenticationToken token){
         // 使用 IniSecurityManagerFactory 根据 ini 配置文件创建一个 SecurityManager工厂
         IniFactorySupport<SecurityManager> factory = new IniSecurityManagerFactory(iniPath);

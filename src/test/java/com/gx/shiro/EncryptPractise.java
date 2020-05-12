@@ -1,7 +1,9 @@
 package com.gx.shiro;
 
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,5 +41,22 @@ public class EncryptPractise {
         String salt = "!25&GRE%e$*";
         String md5SaltStr = new Md5Hash(str, salt).toString();
         System.out.println("MD5加盐加密后："+ md5SaltStr);
+    }
+
+    /**
+     * MD5+salt
+     */
+    @Test
+    public void md5AddSalt(){
+        String algorithmName = "md5";
+        String username = "gx";
+        String password = "123456";
+        String salt = new SecureRandomNumberGenerator().nextBytes().toHex();
+        System.out.println("slat值为：" + salt);
+        // hashIterations 表示 hash 次数
+        int hashIterations = 2;
+        SimpleHash hash = new SimpleHash(algorithmName, password, username + salt, hashIterations);
+        String encodedPassword = hash.toHex();
+        System.out.println("加密后："+ encodedPassword);
     }
 }
