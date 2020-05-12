@@ -28,6 +28,8 @@ public class loginController {
         Subject currentUser = SecurityUtils.getSubject();
         // 在认证提交前准备 token（令牌）
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+        // 记住我
+        token.setRememberMe(true);
         // 执行认证登陆
         try {
             currentUser.login(token);

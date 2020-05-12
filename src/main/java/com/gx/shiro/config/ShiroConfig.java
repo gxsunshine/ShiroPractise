@@ -6,12 +6,17 @@ import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.apache.shiro.mgt.SecurityManager;
 import org.springframework.context.annotation.DependsOn;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @ClassName ShiroConfig
@@ -31,19 +36,13 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         shiroFilterFactoryBean.setLoginUrl("/login");
         shiroFilterFactoryBean.setUnauthorizedUrl("/unAuthorized");
-//        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
-        // <!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
-//        filterChainDefinitionMap.put("/webjars/**", "anon");
-//        filterChainDefinitionMap.put("/login", "anon");
-//        filterChainDefinitionMap.put("/", "anon");
-//        filterChainDefinitionMap.put("/front/**", "anon");
-//        filterChainDefinitionMap.put("/api/**", "anon");
-//
-//        filterChainDefinitionMap.put("/admin/**", "authc");
-//        filterChainDefinitionMap.put("/user/**", "authc");
-        //主要这行代码必须放在所有权限设置的最后，不然会导致所有 url 都被拦截 剩余的都需要认证
-//        filterChainDefinitionMap.put("/**", "authc");
-//        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
+        // authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问; user:表示设置了记住我的可以访问
+
+        filterChainDefinitionMap.put("/user/delete", "authc");
+        // 其他的只要设置了记住我就可以访问
+        filterChainDefinitionMap.put("/**", "user");
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;
 
     }
@@ -54,8 +53,10 @@ public class ShiroConfig {
         DefaultWebSecurityManager defaultSecurityManager = new DefaultWebSecurityManager();
         // 设置自定义realm对象
         defaultSecurityManager.setRealm(customRealm());
-        System.out.println("cacheManage:"+cacheManager());
+        // 设置缓存管理器
         defaultSecurityManager.setCacheManager(cacheManager());
+        // 设置rememberMe管理器
+        defaultSecurityManager.setRememberMeManager(rememberMeManager());
         return defaultSecurityManager;
     }
 
@@ -96,6 +97,30 @@ public class ShiroConfig {
         return cacheManager;
     }
 
+    /**
+     * rememberMe的Cookie
+     * @return
+     */
+    @Bean
+    public SimpleCookie rememberMeCookie(){
+        // 这里必须要给一个Cookie名称，不然在Spring自动注入的时候报错 Cookie name cannot be null/empty
+        SimpleCookie rememberMeCookie = new SimpleCookie("rememberMe");
+        rememberMeCookie.setHttpOnly(true);
+        // 设置过期时间，单位为S, 默认是-1，表示关闭浏览器就失效
+        rememberMeCookie.setMaxAge(120);
+        return  rememberMeCookie;
+    }
+
+    /**
+     * rememberMe管理器
+     * @return
+     */
+    @Bean
+    public CookieRememberMeManager rememberMeManager(){
+        CookieRememberMeManager rememberMeManager = new CookieRememberMeManager();
+        rememberMeManager.setCookie(rememberMeCookie());
+        return rememberMeManager;
+    }
 
     /**
      * 管理shiro中bean的生命周期
