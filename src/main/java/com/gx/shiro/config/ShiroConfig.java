@@ -53,7 +53,7 @@ public class ShiroConfig {
         DefaultWebSecurityManager defaultSecurityManager = new DefaultWebSecurityManager();
         // 设置自定义realm对象
         defaultSecurityManager.setRealm(customRealm());
-        // 设置缓存管理器
+        // 设置缓存管理器 -- 注意如果设置了chacheManager,则会自动缓存授权信息，但是认证信息不会缓存
         defaultSecurityManager.setCacheManager(cacheManager());
         // 设置rememberMe管理器
         defaultSecurityManager.setRememberMeManager(rememberMeManager());
@@ -73,7 +73,7 @@ public class ShiroConfig {
     public CustomRealmCache customRealm() {
         // 创建一个自定义的Realm，并返回
         CustomRealmCache customRealm = new CustomRealmCache();
-        // 启用缓存，默认 false；
+        // 启用缓存，默认 false  -- 如果SecurityManager设置了CacheManager，该功能会自动打开
         customRealm.setCachingEnabled(true);
         // 启用身份验证缓存，即缓存 AuthenticationInfo 信息，默认 false；
         customRealm.setAuthenticationCachingEnabled(true);
